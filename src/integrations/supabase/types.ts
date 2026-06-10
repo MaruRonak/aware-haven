@@ -82,27 +82,66 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           created_at: string
+          language: string
+          location_enabled: boolean
           name: string
           phone: string | null
           role: Database["public"]["Enums"]["user_role"]
+          safety_score: number
           updated_at: string
           user_id: string
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
+          language?: string
+          location_enabled?: boolean
           name?: string
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+          safety_score?: number
           updated_at?: string
           user_id: string
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
+          language?: string
+          location_enabled?: boolean
           name?: string
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+          safety_score?: number
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      quiz_scores: {
+        Row: {
+          created_at: string
+          id: string
+          score: number
+          topic: string | null
+          total: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          score: number
+          topic?: string | null
+          total: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          score?: number
+          topic?: string | null
+          total?: number
           user_id?: string
         }
         Relationships: []
