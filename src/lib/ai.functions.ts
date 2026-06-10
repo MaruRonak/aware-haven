@@ -96,7 +96,7 @@ export const analyzeThreat = createServerFn({ method: "POST" })
       severity: parsed.severity,
       description: parsed.explanation,
       input_text: data.text.slice(0, 2000),
-      ai_response: parsed as unknown as Record<string, unknown>,
+      ai_response: parsed as never,
     });
 
     return parsed;
