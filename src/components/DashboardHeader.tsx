@@ -30,7 +30,8 @@ export function DashboardHeader({ accent = "rose" }: { accent?: "rose" | "amber"
     if (!profile) return;
     const next = !profile.location_enabled;
     setProfile({ ...profile, location_enabled: next });
-    await supabase.from("profiles").update({ location_enabled: next }).eq("role", profile.role);
+    const { data: u } = await supabase.auth.getUser();
+    if (u.user) await supabase.from("profiles").update({ location_enabled: next }).eq("user_id", u.user.id);
     toast.success(next ? "Location sharing ON" : "Location sharing OFF");
   };
 
