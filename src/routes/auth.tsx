@@ -13,8 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — SafeSphere AI" },
-      { name: "description", content: "Sign in or create your SafeSphere AI safety profile." },
+      { title: "Sign in — Cyber Raksha" },
+      { name: "description", content: "Sign in or create your Cyber Raksha account." },
     ],
   }),
   component: AuthPage,
@@ -47,7 +47,7 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Account created. Welcome to SafeSphere AI.");
+        toast.success("Account created. Welcome to Cyber Raksha.");
         navigate({ to: "/dashboard" });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -90,8 +90,8 @@ function AuthPage() {
               <Shield className="h-5 w-5" />
             </div>
             <div>
-              <div className="font-semibold">SafeSphere<span className="gradient-text">AI</span></div>
-              <div className="text-xs text-muted-foreground">Your AI safety companion</div>
+              <div className="font-semibold">Cyber<span className="gradient-text">Raksha</span></div>
+              <div className="text-xs text-muted-foreground">Smart cybersecurity for everyone</div>
             </div>
           </div>
 
@@ -155,7 +155,7 @@ function AuthPage() {
         </div>
 
         <p className="mt-4 text-center text-xs text-muted-foreground">
-          By continuing you agree to use SafeSphere AI responsibly. Not a replacement for emergency services.
+          By continuing you agree to use Cyber Raksha responsibly. Not a replacement for emergency services — dial 112.
         </p>
       </div>
     </div>
