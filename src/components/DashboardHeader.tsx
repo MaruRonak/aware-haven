@@ -1,16 +1,19 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Shield, User, MapPin, LogOut, Settings } from "lucide-react";
+import { Bell, Globe, LogOut, Menu, Shield, User } from "lucide-react";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 
 type Profile = {
   name: string;
   role: string;
   safety_score: number;
-  location_enabled: boolean;
 };
+
+const accentStyles = {
+  rose: { bg: "var(--gradient-women)" },
+  amber: { bg: "var(--gradient-children)" },
+  emerald: { bg: "var(--gradient-senior)" },
+} as const;
 
 export function DashboardHeader({ accent = "rose" }: { accent?: "rose" | "amber" | "emerald" }) {
   const navigate = useNavigate();
@@ -20,72 +23,52 @@ export function DashboardHeader({ accent = "rose" }: { accent?: "rose" | "amber"
     (async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("name, role, safety_score, location_enabled")
+        .select("name, role, safety_score")
         .maybeSingle();
       if (data) setProfile(data as Profile);
     })();
   }, []);
-
-  const toggleLocation = async () => {
-    if (!profile) return;
-    const next = !profile.location_enabled;
-    setProfile({ ...profile, location_enabled: next });
-    const { data: u } = await supabase.auth.getUser();
-    if (u.user) await supabase.from("profiles").update({ location_enabled: next }).eq("user_id", u.user.id);
-    toast.success(next ? "Location sharing ON" : "Location sharing OFF");
-  };
 
   const signOut = async () => {
     await supabase.auth.signOut();
     navigate({ to: "/", replace: true });
   };
 
-  const score = profile?.safety_score ?? 75;
-  const scoreColor = score >= 75 ? "text-emerald-500" : score >= 50 ? "text-amber-500" : "text-rose-500";
-  const accentGrad: Record<string, string> = {
-    rose: "from-rose-500 to-pink-500",
-    amber: "from-amber-500 to-orange-500",
-    emerald: "from-emerald-500 to-teal-500",
-  };
-
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
-      <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4">
-        <Link to="/" className="flex items-center gap-2">
-          <div className={`grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br ${accentGrad[accent]} text-white shadow-glow`}>
-            <Shield className="h-4 w-4" />
+    <header className="overflow-hidden rounded-b-[2rem] text-white" style={{ background: accentStyles[accent].bg }}>
+      <div className="container mx-auto max-w-6xl px-4 pb-8 pt-5 sm:pt-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <button type="button" className="grid h-11 w-11 place-items-center rounded-2xl bg-white/12 backdrop-blur">
+              <Menu className="h-5 w-5" />
+            </button>
+            <div>
+              <div className="text-2xl font-bold leading-tight">{profile?.name ? `Hello, ${profile.name.split(" ")[0]}!` : "Hello!"}</div>
+              <div className="mt-1 flex items-center gap-2 text-sm text-white/90">
+                <Shield className="h-4 w-4" />
+                {profile?.role === "parent" ? "Learn. Play. Stay Safe." : profile?.role === "senior" ? "Stay Safe. Stay Secure." : "Stay Alert, Stay Safe"}
+              </div>
+            </div>
           </div>
-          <span className="font-semibold">Cyber<span className="gradient-text">Raksha</span></span>
-        </Link>
 
-        <div className="flex items-center gap-2">
-          {/* Safety Score */}
-          <div className={`hidden items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium sm:flex ${scoreColor}`}>
-            <span className="text-base">🛡️</span>
-            <span>Safety {score}%</span>
+          <div className="flex items-center gap-2">
+            <div className="hidden hero-badge px-3 py-2 text-xs font-semibold text-white sm:flex">
+              <Shield className="mr-1 h-3.5 w-3.5" /> Safety Score: {profile?.safety_score ?? 80}%
+            </div>
+            <button type="button" className="relative grid h-11 w-11 place-items-center rounded-2xl bg-white/12 backdrop-blur">
+              <Bell className="h-5 w-5" />
+              <span className="absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-rose-500 text-[10px] font-bold">3</span>
+            </button>
+            <Link to="/profile" className="grid h-11 w-11 place-items-center rounded-2xl bg-white/12 backdrop-blur">
+              <User className="h-5 w-5" />
+            </Link>
+            <Link to="/role-select" className="hidden items-center gap-2 rounded-2xl bg-white/12 px-3 py-2 text-sm backdrop-blur sm:flex">
+              <Globe className="h-4 w-4" /> Switch
+            </Link>
+            <button type="button" onClick={signOut} className="grid h-11 w-11 place-items-center rounded-2xl bg-white/12 backdrop-blur">
+              <LogOut className="h-5 w-5" />
+            </button>
           </div>
-
-          {/* Location toggle */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={toggleLocation}
-            className={profile?.location_enabled ? "border-emerald-500/40 text-emerald-600 dark:text-emerald-400" : ""}
-          >
-            <MapPin className="h-4 w-4" />
-            <span className="hidden sm:inline">{profile?.location_enabled ? "On" : "Off"}</span>
-          </Button>
-
-          {/* Profile */}
-          <Button asChild variant="ghost" size="icon" aria-label="Profile">
-            <Link to="/profile"><User className="h-4 w-4" /></Link>
-          </Button>
-          <Button asChild variant="ghost" size="icon" aria-label="Switch role">
-            <Link to="/role-select"><Settings className="h-4 w-4" /></Link>
-          </Button>
-          <Button variant="ghost" size="icon" onClick={signOut} aria-label="Sign out">
-            <LogOut className="h-4 w-4" />
-          </Button>
         </div>
       </div>
     </header>
