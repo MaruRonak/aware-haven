@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Clock, MapPin, CheckCircle2 } from "lucide-react";
+import { Clock3, MapPin, CheckCircle2, ChevronRight } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,7 +25,7 @@ export function RecentAlerts() {
       .from("sos_alerts")
       .select("id,latitude,longitude,status,created_at")
       .order("created_at", { ascending: false })
-      .limit(8);
+      .limit(6);
     if (error) toast.error(error.message);
     setAlerts((data as Alert[] | null) ?? []);
     setLoading(false);
@@ -51,40 +51,47 @@ export function RecentAlerts() {
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6">
-      <h3 className="text-lg font-semibold">Recent SOS alerts</h3>
-      <ul className="mt-4 space-y-2">
+    <div className="mobile-shell p-5 sm:p-6">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-lg font-semibold">Recent SOS Activity</h3>
+        <span className="text-xs text-primary">View all</span>
+      </div>
+      <ul className="mt-4 space-y-3">
         {loading ? (
           <li className="text-sm text-muted-foreground">Loading…</li>
         ) : alerts.length === 0 ? (
-          <li className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-            No alerts yet. You're safe.
+          <li className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+            No SOS alerts sent yet.
           </li>
         ) : (
           alerts.map((a) => (
-            <li key={a.id} className="flex items-center justify-between gap-3 rounded-xl border border-border p-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${a.status === "active" ? "bg-destructive/15 text-destructive" : "bg-success/15 text-success"}`}>
-                  {a.status === "active" ? <Clock className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
-                </div>
-                <div className="min-w-0 text-sm">
-                  <div className="font-medium capitalize">{a.status}</div>
-                  <div className="text-xs text-muted-foreground flex items-center gap-1">
-                    {a.latitude != null && a.longitude != null && (
-                      <>
-                        <MapPin className="h-3 w-3" />
-                        {a.latitude.toFixed(3)}, {a.longitude.toFixed(3)} ·{" "}
-                      </>
-                    )}
-                    {formatDistanceToNow(new Date(a.created_at), { addSuffix: true })}
+            <li key={a.id} className="soft-tile p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl ${a.status === "active" ? "bg-rose-100 text-rose-600" : "bg-emerald-100 text-emerald-600"}`}>
+                    {a.status === "active" ? <Clock3 className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
+                  </div>
+                  <div className="min-w-0 text-sm">
+                    <div className="font-semibold capitalize">{a.status === "active" ? "SOS sent" : "Resolved alert"}</div>
+                    <div className="mt-1 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
+                      {a.latitude != null && a.longitude != null && (
+                        <>
+                          <MapPin className="h-3 w-3" />
+                          {a.latitude.toFixed(3)}, {a.longitude.toFixed(3)} ·
+                        </>
+                      )}
+                      {formatDistanceToNow(new Date(a.created_at), { addSuffix: true })}
+                    </div>
                   </div>
                 </div>
+                {a.status === "active" ? (
+                  <Button size="sm" variant="outline" onClick={() => handleResolve(a.id)} className="rounded-2xl">
+                    Resolve
+                  </Button>
+                ) : (
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                )}
               </div>
-              {a.status === "active" && (
-                <Button size="sm" variant="outline" onClick={() => handleResolve(a.id)}>
-                  Resolve
-                </Button>
-              )}
             </li>
           ))
         )}
