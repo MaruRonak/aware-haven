@@ -80,6 +80,93 @@ export type Database = {
         }
         Relationships: []
       }
+      incident_reports: {
+        Row: {
+          address: string | null
+          category: Database["public"]["Enums"]["incident_category"]
+          created_at: string
+          description: string | null
+          evidence_url: string | null
+          id: string
+          is_anonymous: boolean
+          latitude: number | null
+          longitude: number | null
+          occurred_at: string
+          status: Database["public"]["Enums"]["incident_status"]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          category?: Database["public"]["Enums"]["incident_category"]
+          created_at?: string
+          description?: string | null
+          evidence_url?: string | null
+          id?: string
+          is_anonymous?: boolean
+          latitude?: number | null
+          longitude?: number | null
+          occurred_at?: string
+          status?: Database["public"]["Enums"]["incident_status"]
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          category?: Database["public"]["Enums"]["incident_category"]
+          created_at?: string
+          description?: string | null
+          evidence_url?: string | null
+          id?: string
+          is_anonymous?: boolean
+          latitude?: number | null
+          longitude?: number | null
+          occurred_at?: string
+          status?: Database["public"]["Enums"]["incident_status"]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      location_history: {
+        Row: {
+          accuracy_meters: number | null
+          battery_level: number | null
+          created_at: string
+          id: string
+          latitude: number
+          longitude: number
+          recorded_at: string
+          speed: number | null
+          user_id: string
+        }
+        Insert: {
+          accuracy_meters?: number | null
+          battery_level?: number | null
+          created_at?: string
+          id?: string
+          latitude: number
+          longitude: number
+          recorded_at?: string
+          speed?: number | null
+          user_id: string
+        }
+        Update: {
+          accuracy_meters?: number | null
+          battery_level?: number | null
+          created_at?: string
+          id?: string
+          latitude?: number
+          longitude?: number
+          recorded_at?: string
+          speed?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -146,6 +233,42 @@ export type Database = {
         }
         Relationships: []
       }
+      safe_zones: {
+        Row: {
+          address: string | null
+          created_at: string
+          id: string
+          label: string
+          latitude: number
+          longitude: number
+          radius_meters: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          label: string
+          latitude: number
+          longitude: number
+          radius_meters?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          label?: string
+          latitude?: number
+          longitude?: number
+          radius_meters?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       sos_alerts: {
         Row: {
           address: string | null
@@ -182,6 +305,45 @@ export type Database = {
         }
         Relationships: []
       }
+      trusted_circle: {
+        Row: {
+          can_track_location: boolean
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          notify_on_sos: boolean
+          phone: string
+          relation: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          can_track_location?: boolean
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          notify_on_sos?: boolean
+          phone: string
+          relation?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          can_track_location?: boolean
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          notify_on_sos?: boolean
+          phone?: string
+          relation?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -191,6 +353,15 @@ export type Database = {
     }
     Enums: {
       alert_severity: "low" | "medium" | "high" | "critical"
+      incident_category:
+        | "harassment"
+        | "stalking"
+        | "theft"
+        | "assault"
+        | "cyber"
+        | "suspicious"
+        | "other"
+      incident_status: "open" | "investigating" | "resolved" | "closed"
       sos_status: "active" | "resolved"
       user_role: "woman" | "parent" | "senior" | "admin"
     }
@@ -321,6 +492,16 @@ export const Constants = {
   public: {
     Enums: {
       alert_severity: ["low", "medium", "high", "critical"],
+      incident_category: [
+        "harassment",
+        "stalking",
+        "theft",
+        "assault",
+        "cyber",
+        "suspicious",
+        "other",
+      ],
+      incident_status: ["open", "investigating", "resolved", "closed"],
       sos_status: ["active", "resolved"],
       user_role: ["woman", "parent", "senior", "admin"],
     },
