@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EyeOff, Lock, Mail, Shield, User } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,6 +28,13 @@ function AuthPage() {
   const [role, setRole] = useState<"woman" | "parent" | "senior">("woman");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) navigate({ to: "/dashboard", replace: true });
+    });
+  }, [navigate]);
+
 
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
