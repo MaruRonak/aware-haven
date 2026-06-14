@@ -1,6 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Shield, Siren, MapPin, Brain, PhoneCall, HeartPulse, ArrowRight, Sparkles, Users, BookOpen, Lock } from "lucide-react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
