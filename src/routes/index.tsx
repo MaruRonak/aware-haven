@@ -32,8 +32,15 @@ const audiences = [
 ];
 
 function Landing() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) navigate({ to: "/dashboard", replace: true });
+    });
+  }, [navigate]);
   return (
     <div className="min-h-screen bg-background">
+
       <header className="sticky top-0 z-50 backdrop-blur-md bg-background/70 border-b border-border">
         <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <Link to="/" className="flex items-center gap-2 font-semibold">
