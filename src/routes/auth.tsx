@@ -29,6 +29,13 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) navigate({ to: "/dashboard", replace: true });
+    });
+  }, [navigate]);
+
+
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
