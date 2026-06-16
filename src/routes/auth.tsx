@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { EyeOff, Lock, Mail, Shield, User } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, Shield, User } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -28,13 +29,16 @@ function AuthPage() {
   const [role, setRole] = useState<"woman" | "parent" | "senior">("woman");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/dashboard", replace: true });
     });
   }, [navigate]);
-
 
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,8 +54,10 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Account created. Welcome to Cyber Raksha.");
-        navigate({ to: "/dashboard" });
+        toast.success("Account created. Please sign in to continue.");
+        // Switch to login tab and prefill email
+        setMode("signin");
+        setPassword("");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -77,6 +83,24 @@ function AuthPage() {
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Google sign-in failed");
       setLoading(false);
+    }
+  };
+
+  const handleForgot = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      toast.success("Password reset email sent. Check your inbox.");
+      setForgotOpen(false);
+      setForgotEmail("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not send reset email");
+    } finally {
+      setForgotLoading(false);
     }
   };
 
@@ -120,16 +144,49 @@ function AuthPage() {
 
                   <TabsContent value="signin" className="mt-6">
                     <form onSubmit={handleEmail} className="space-y-4">
-                      <Field label="Email / Mobile Number" icon={<Mail className="h-5 w-5" />}>
-                        <Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="h-14 rounded-[1.25rem] border-0 bg-transparent text-lg shadow-none" placeholder="Email / Mobile Number" />
+                      <Field label="Email" icon={<Mail className="h-5 w-5" />}>
+                        <Input
+                          type="email"
+                          required
+                          autoComplete="email"
+                          inputMode="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="h-14 rounded-[1.25rem] border-0 bg-transparent text-lg shadow-none"
+                          placeholder="you@example.com"
+                        />
                       </Field>
-                      <Field label="Password" icon={<Lock className="h-5 w-5" />} right={<EyeOff className="h-5 w-5 text-muted-foreground" />}>
-                        <Input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className="h-14 rounded-[1.25rem] border-0 bg-transparent text-lg shadow-none" placeholder="Password" />
+                      <Field
+                        label="Password"
+                        icon={<Lock className="h-5 w-5" />}
+                        right={
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword((s) => !s)}
+                            aria-label={showPassword ? "Hide password" : "Show password"}
+                            className="text-muted-foreground hover:text-foreground"
+                          >
+                            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                          </button>
+                        }
+                      >
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          required
+                          minLength={6}
+                          autoComplete="current-password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="h-14 rounded-[1.25rem] border-0 bg-transparent text-lg shadow-none"
+                          placeholder="Password"
+                        />
                       </Field>
 
                       <div className="flex items-center justify-between px-1 text-sm">
                         <label className="flex items-center gap-2"><input type="checkbox" defaultChecked /> Remember me</label>
-                        <button type="button" className="text-primary">Forgot Password?</button>
+                        <button type="button" onClick={() => { setForgotEmail(email); setForgotOpen(true); }} className="text-primary font-medium">
+                          Forgot Password?
+                        </button>
                       </div>
 
                       <Button type="submit" disabled={loading} className="h-14 w-full rounded-[1.25rem] text-xl font-bold">
@@ -157,14 +214,51 @@ function AuthPage() {
                         </Select>
                       </div>
                       <Field label="Email" icon={<Mail className="h-5 w-5" />}>
-                        <Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="h-14 rounded-[1.25rem] border-0 bg-transparent text-lg shadow-none" placeholder="you@example.com" />
+                        <Input
+                          type="email"
+                          required
+                          autoComplete="email"
+                          inputMode="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="h-14 rounded-[1.25rem] border-0 bg-transparent text-lg shadow-none"
+                          placeholder="you@example.com"
+                        />
                       </Field>
-                      <Field label="Password" icon={<Lock className="h-5 w-5" />}>
-                        <Input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className="h-14 rounded-[1.25rem] border-0 bg-transparent text-lg shadow-none" placeholder="Create password" />
+                      <Field
+                        label="Password"
+                        icon={<Lock className="h-5 w-5" />}
+                        right={
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword((s) => !s)}
+                            aria-label={showPassword ? "Hide password" : "Show password"}
+                            className="text-muted-foreground hover:text-foreground"
+                          >
+                            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                          </button>
+                        }
+                      >
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          required
+                          minLength={6}
+                          autoComplete="new-password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="h-14 rounded-[1.25rem] border-0 bg-transparent text-lg shadow-none"
+                          placeholder="Create password"
+                        />
                       </Field>
                       <Button type="submit" disabled={loading} className="h-14 w-full rounded-[1.25rem] text-lg font-bold">
                         {loading ? "Creating account…" : "Create Account"}
                       </Button>
+                      <p className="text-center text-sm text-muted-foreground">
+                        Already have an account?{" "}
+                        <button type="button" onClick={() => setMode("signin")} className="font-semibold text-primary">
+                          Login
+                        </button>
+                      </p>
                     </form>
                   </TabsContent>
                 </Tabs>
@@ -184,6 +278,35 @@ function AuthPage() {
           </div>
         </div>
       </div>
+
+      <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
+        <DialogContent className="rounded-[1.5rem]">
+          <DialogHeader>
+            <DialogTitle>Reset your password</DialogTitle>
+            <DialogDescription>
+              Enter your email and we'll send a secure link to reset your password.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleForgot} className="space-y-4">
+            <Field label="Email" icon={<Mail className="h-5 w-5" />}>
+              <Input
+                type="email"
+                required
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                className="h-12 rounded-[1rem] border-0 bg-transparent text-base shadow-none"
+                placeholder="you@example.com"
+              />
+            </Field>
+            <DialogFooter className="gap-2">
+              <Button type="button" variant="outline" onClick={() => setForgotOpen(false)}>Cancel</Button>
+              <Button type="submit" disabled={forgotLoading}>
+                {forgotLoading ? "Sending…" : "Send reset link"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
