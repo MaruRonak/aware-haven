@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { MapPin, Shield, MessageSquareWarning, Bot, BookOpen, PhoneCall, ChevronRight, Siren, Bell, UserRound } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { SOSButton } from "@/components/SOSButton";
 import { MapView } from "@/components/MapView";
@@ -25,17 +24,18 @@ function Dashboard() {
   const [external, setExternal] = useState<{ latitude: number | null; longitude: number | null }>();
 
   useEffect(() => {
-    (async () => {
-      const { data } = await supabase.from("profiles").select("name, role, safety_score").maybeSingle();
-      if (!data?.role) {
-        navigate({ to: "/role-select", replace: true });
-        return;
-      }
-      setRole(data.role);
-      setScore(data.safety_score ?? 75);
-      if (data.name) setName(data.name.split(" ")[0]);
-    })();
-  }, [navigate]);
+  const selectedRole = localStorage.getItem("role");
+
+  if (!selectedRole) {
+    navigate({
+      to: "/role-select",
+      replace: true,
+    });
+    return;
+  }
+
+  setRole(selectedRole);
+}, [navigate]);
 
   if (!role) return <div className="min-h-screen grid place-items-center text-muted-foreground">Loading dashboard…</div>;
 

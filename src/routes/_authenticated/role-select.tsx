@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Shield, ArrowRight, Globe } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/role-select")({
@@ -40,22 +39,13 @@ function RoleSelect() {
   const navigate = useNavigate();
   const [saving, setSaving] = useState<string | null>(null);
 
-  const pick = async (role: "woman" | "parent" | "senior") => {
-    setSaving(role);
-    const { data: u } = await supabase.auth.getUser();
-    if (!u.user) return navigate({ to: "/auth" });
-    const { error } = await supabase
-      .from("profiles")
-      .update({ role })
-      .eq("user_id", u.user.id);
-    if (error) {
-      toast.error(error.message);
-      setSaving(null);
-      return;
-    }
-    toast.success("Role updated");
-    navigate({ to: "/dashboard" });
-  };
+ const pick = async (role: "woman" | "parent" | "senior") => {
+  localStorage.setItem("role", role);
+
+  navigate({
+    to: "/dashboard",
+  });
+};
 
   return (
     <div className="min-h-screen px-4 py-6">
