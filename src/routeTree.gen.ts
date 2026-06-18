@@ -21,6 +21,7 @@ import { Route as AuthenticatedRoleSelectRouteImport } from './routes/_authentic
 import { Route as AuthenticatedReportRouteImport } from './routes/_authenticated/report'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedAlertsHistoryRouteImport } from './routes/_authenticated/alerts-history'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -81,6 +82,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAlertsHistoryRoute =
+  AuthenticatedAlertsHistoryRouteImport.update({
+    id: '/alerts-history',
+    path: '/alerts-history',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -89,6 +96,7 @@ export interface FileRoutesByFullPath {
   '/auth-debug': typeof AuthDebugRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/alerts-history': typeof AuthenticatedAlertsHistoryRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/report': typeof AuthenticatedReportRoute
@@ -102,6 +110,7 @@ export interface FileRoutesByTo {
   '/auth-debug': typeof AuthDebugRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/alerts-history': typeof AuthenticatedAlertsHistoryRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/report': typeof AuthenticatedReportRoute
@@ -117,6 +126,7 @@ export interface FileRoutesById {
   '/auth-debug': typeof AuthDebugRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/alerts-history': typeof AuthenticatedAlertsHistoryRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/report': typeof AuthenticatedReportRoute
@@ -132,6 +142,7 @@ export interface FileRouteTypes {
     | '/auth-debug'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/alerts-history'
     | '/dashboard'
     | '/profile'
     | '/report'
@@ -145,6 +156,7 @@ export interface FileRouteTypes {
     | '/auth-debug'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/alerts-history'
     | '/dashboard'
     | '/profile'
     | '/report'
@@ -159,6 +171,7 @@ export interface FileRouteTypes {
     | '/auth-debug'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/_authenticated/alerts-history'
     | '/_authenticated/dashboard'
     | '/_authenticated/profile'
     | '/_authenticated/report'
@@ -262,10 +275,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/alerts-history': {
+      id: '/_authenticated/alerts-history'
+      path: '/alerts-history'
+      fullPath: '/alerts-history'
+      preLoaderRoute: typeof AuthenticatedAlertsHistoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAlertsHistoryRoute: typeof AuthenticatedAlertsHistoryRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReportRoute: typeof AuthenticatedReportRoute
@@ -274,6 +295,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAlertsHistoryRoute: AuthenticatedAlertsHistoryRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReportRoute: AuthenticatedReportRoute,
@@ -296,13 +318,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

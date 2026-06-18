@@ -98,25 +98,33 @@ function Dashboard() {
             <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {[
                 { to: "/report", title: "Report Harassment", desc: "Report any harassment or inappropriate behavior", icon: MessageSquareWarning, tone: "from-rose-50 to-pink-50", iconTone: "bg-rose-100 text-rose-600" },
-                { to: "/dashboard", title: "Check Suspicious Message", desc: "Analyze messages and detect possible scams or threats", icon: MessageSquareWarning, tone: "from-sky-50 to-indigo-50", iconTone: "bg-sky-100 text-sky-600" },
-                { to: "/dashboard", title: "AI Safety Assistant", desc: "Get instant help and guidance from our AI assistant", icon: Bot, tone: "from-emerald-50 to-lime-50", iconTone: "bg-emerald-100 text-emerald-600" },
+                { to: "#analyzer", title: "Check Suspicious Message", desc: "Analyze messages and detect possible scams or threats", icon: MessageSquareWarning, tone: "from-sky-50 to-indigo-50", iconTone: "bg-sky-100 text-sky-600" },
+                { to: "#analyzer", title: "AI Safety Assistant", desc: "Get instant help and guidance from our AI assistant", icon: Bot, tone: "from-emerald-50 to-lime-50", iconTone: "bg-emerald-100 text-emerald-600" },
                 { to: "/sos", title: "Safe Route Finder", desc: "Find the safest routes to your destination", icon: MapPin, tone: "from-orange-50 to-amber-50", iconTone: "bg-orange-100 text-orange-600" },
                 { to: "#contacts", title: "Trusted Contacts", desc: "Manage your emergency contacts and family", icon: PhoneCall, tone: "from-violet-50 to-fuchsia-50", iconTone: "bg-violet-100 text-violet-600" },
-                { to: "/profile", title: "Safety Tips", desc: "Daily tips to stay safe and aware", icon: BookOpen, tone: "from-yellow-50 to-orange-50", iconTone: "bg-yellow-100 text-yellow-600" },
-              ].map((card) => (
-                <Link key={card.title} to={card.to as never} className={`soft-tile soft-tile-hover block bg-gradient-to-br ${card.tone} p-5`}>
-                  <div className={`grid h-14 w-14 place-items-center rounded-2xl ${card.iconTone}`}>
-                    <card.icon className="h-6 w-6" />
-                  </div>
-                  <div className="mt-4 flex items-start justify-between gap-3">
-                    <div>
-                      <h3 className="text-2xl font-bold leading-tight">{card.title}</h3>
-                      <p className="mt-3 text-sm text-muted-foreground">{card.desc}</p>
+                { to: "/alerts-history", title: "SOS History", desc: "View all past SOS alerts and statuses", icon: BookOpen, tone: "from-yellow-50 to-orange-50", iconTone: "bg-yellow-100 text-yellow-600" },
+              ].map((card) => {
+                const cls = `soft-tile soft-tile-hover block bg-gradient-to-br ${card.tone} p-5`;
+                const inner = (
+                  <>
+                    <div className={`grid h-14 w-14 place-items-center rounded-2xl ${card.iconTone}`}>
+                      <card.icon className="h-6 w-6" />
                     </div>
-                    <ChevronRight className="mt-1 h-5 w-5 text-primary" />
-                  </div>
-                </Link>
-              ))}
+                    <div className="mt-4 flex items-start justify-between gap-3">
+                      <div>
+                        <h3 className="text-2xl font-bold leading-tight">{card.title}</h3>
+                        <p className="mt-3 text-sm text-muted-foreground">{card.desc}</p>
+                      </div>
+                      <ChevronRight className="mt-1 h-5 w-5 text-primary" />
+                    </div>
+                  </>
+                );
+                return card.to.startsWith("#") ? (
+                  <a key={card.title} href={card.to} className={cls}>{inner}</a>
+                ) : (
+                  <Link key={card.title} to={card.to as never} className={cls}>{inner}</Link>
+                );
+              })}
             </section>
 
             <section className="grid gap-6 lg:grid-cols-2">

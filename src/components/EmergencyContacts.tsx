@@ -43,21 +43,31 @@ export function EmergencyContacts() {
 
   const add = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !phone.trim()) return;
+    const trimmedName = name.trim();
+    const trimmedPhone = phone.trim();
+    if (trimmedName.length < 2 || trimmedName.length > 60) {
+      toast.error("Name must be between 2 and 60 characters.");
+      return;
+    }
+    const digits = trimmedPhone.replace(/[^\d]/g, "");
+    if (digits.length < 10 || digits.length > 15) {
+      toast.error("Enter a valid phone number (10–15 digits, with optional +country code).");
+      return;
+    }
     setAdding(true);
     const { data: user } = await supabase.auth.getUser();
     const uid = user.user?.id;
-    if (!uid) { setAdding(false); return; }
+    if (!uid) { setAdding(false); toast.error("Please sign in again."); return; }
     const { error } = await supabase.from("emergency_contacts").insert({
       user_id: uid,
-      name: name.trim(),
-      phone: phone.trim(),
+      name: trimmedName,
+      phone: trimmedPhone,
       relation: relation.trim() || null,
       is_primary: contacts.length === 0,
     });
     if (error) toast.error(error.message);
     else {
-      toast.success(`${name} added to emergency contacts`);
+      toast.success(`${trimmedName} added to emergency contacts`);
       setName(""); setPhone(""); setRelation("");
       load();
     }
@@ -73,7 +83,7 @@ export function EmergencyContacts() {
   const primary = useMemo(() => contacts.find((c) => c.is_primary) ?? contacts[0], [contacts]);
 
   return (
-    <div className="mobile-shell p-5 sm:p-6">
+    <div id="contacts" className="mobile-shell scroll-mt-24 p-5 sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className="text-lg font-semibold">Emergency Contacts</h3>
