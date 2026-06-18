@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Siren, Loader2, Check, PhoneCall, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
@@ -19,7 +19,16 @@ function getPosition(): Promise<GeolocationPosition | null> {
 function normalizePhone(phone: string) {
   const cleaned = phone.replace(/[^\d+]/g, "");
   if (cleaned.startsWith("+")) return cleaned;
+  if (cleaned.length === 10) return `+91${cleaned}`;
   return `+${cleaned}`;
+}
+
+function buildWhatsappUrl(phone: string, lat: number | null, lon: number | null) {
+  const e164 = normalizePhone(phone).replace(/^\+/, "");
+  const message = lat != null && lon != null
+    ? `Emergency alert from Cyber Raksha. My live location: https://maps.google.com/?q=${lat},${lon}`
+    : "Emergency alert from Cyber Raksha. Please contact me immediately.";
+  return `https://wa.me/${e164}?text=${encodeURIComponent(message)}`;
 }
 
 export function SOSButton({ onSent }: { onSent?: (a: { latitude: number | null; longitude: number | null }) => void }) {
@@ -28,15 +37,6 @@ export function SOSButton({ onSent }: { onSent?: (a: { latitude: number | null; 
   const [location, setLocation] = useState<{ latitude: number | null; longitude: number | null } | null>(null);
   const trigger = useServerFn(triggerSOS);
 
-  const whatsappUrl = useMemo(() => {
-    if (!contactPhone) return null;
-    const phone = normalizePhone(contactPhone).replace(/^\+/, "");
-    const message = location?.latitude != null && location.longitude != null
-      ? `Emergency alert from Cyber Raksha. My live location: https://maps.google.com/?q=${location.latitude},${location.longitude}`
-      : "Emergency alert from Cyber Raksha. Please contact me immediately.";
-    return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-  }, [contactPhone, location]);
-
   const handleClick = async () => {
     if (state !== "idle") return;
     setState("sending");
@@ -44,30 +44,40 @@ export function SOSButton({ onSent }: { onSent?: (a: { latitude: number | null; 
       const pos = await getPosition();
       const latitude = pos?.coords.latitude ?? null;
       const longitude = pos?.coords.longitude ?? null;
-      const res = await trigger({
-        data: { latitude, longitude, address: null, notes: null },
-      });
+      if (!pos) toast.message("Location unavailable — sending SOS without coordinates.");
+
+      const res = await trigger({ data: { latitude, longitude, address: null, notes: null } });
       const primary = res.notifiedContacts[0] ?? null;
       setContactPhone(primary?.phone ?? null);
       setLocation({ latitude, longitude });
       setState("sent");
-      const count = res.notifiedContacts.length;
+
       toast.success(
-        count > 0
-          ? `SOS sent. Emergency actions are ready for ${primary?.name ?? "your primary contact"}.`
-          : "SOS recorded. Add emergency contacts so calling and WhatsApp sharing work.",
+        res.notifiedContacts.length > 0
+          ? `SOS sent. Calling ${primary?.name ?? "your primary contact"}…`
+          : "SOS recorded. Add an emergency contact to enable calling.",
       );
       onSent?.({ latitude, longitude });
+
+      // Open WhatsApp FIRST (new tab), then call — tel: navigates away.
       if (primary?.phone) {
-        if (whatsappUrl) window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-        window.location.href = `tel:${normalizePhone(primary.phone)}`;
+        try {
+          window.open(buildWhatsappUrl(primary.phone, latitude, longitude), "_blank", "noopener,noreferrer");
+        } catch { /* popup blocker — fallback buttons remain below */ }
+        setTimeout(() => {
+          try { window.location.href = `tel:${normalizePhone(primary.phone)}`; } catch { /* noop */ }
+        }, 250);
       }
-      setTimeout(() => setState("idle"), 5000);
+      setTimeout(() => setState("idle"), 8000);
     } catch (err) {
       setState("idle");
       toast.error(err instanceof Error ? err.message : "Could not send SOS");
     }
   };
+
+  const whatsappUrl = contactPhone
+    ? buildWhatsappUrl(contactPhone, location?.latitude ?? null, location?.longitude ?? null)
+    : null;
 
   return (
     <div className="flex flex-col items-center gap-4">

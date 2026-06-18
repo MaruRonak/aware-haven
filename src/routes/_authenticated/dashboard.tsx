@@ -98,11 +98,11 @@ function Dashboard() {
             <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {[
                 { to: "/report", title: "Report Harassment", desc: "Report any harassment or inappropriate behavior", icon: MessageSquareWarning, tone: "from-rose-50 to-pink-50", iconTone: "bg-rose-100 text-rose-600" },
-                { to: "/dashboard", title: "Check Suspicious Message", desc: "Analyze messages and detect possible scams or threats", icon: MessageSquareWarning, tone: "from-sky-50 to-indigo-50", iconTone: "bg-sky-100 text-sky-600" },
-                { to: "/dashboard", title: "AI Safety Assistant", desc: "Get instant help and guidance from our AI assistant", icon: Bot, tone: "from-emerald-50 to-lime-50", iconTone: "bg-emerald-100 text-emerald-600" },
+                { to: "#analyzer", title: "Check Suspicious Message", desc: "Analyze messages and detect possible scams or threats", icon: MessageSquareWarning, tone: "from-sky-50 to-indigo-50", iconTone: "bg-sky-100 text-sky-600" },
+                { to: "#analyzer", title: "AI Safety Assistant", desc: "Get instant help and guidance from our AI assistant", icon: Bot, tone: "from-emerald-50 to-lime-50", iconTone: "bg-emerald-100 text-emerald-600" },
                 { to: "/sos", title: "Safe Route Finder", desc: "Find the safest routes to your destination", icon: MapPin, tone: "from-orange-50 to-amber-50", iconTone: "bg-orange-100 text-orange-600" },
                 { to: "#contacts", title: "Trusted Contacts", desc: "Manage your emergency contacts and family", icon: PhoneCall, tone: "from-violet-50 to-fuchsia-50", iconTone: "bg-violet-100 text-violet-600" },
-                { to: "/profile", title: "Safety Tips", desc: "Daily tips to stay safe and aware", icon: BookOpen, tone: "from-yellow-50 to-orange-50", iconTone: "bg-yellow-100 text-yellow-600" },
+                { to: "/alerts-history", title: "SOS History", desc: "View all past SOS alerts and statuses", icon: BookOpen, tone: "from-yellow-50 to-orange-50", iconTone: "bg-yellow-100 text-yellow-600" },
               ].map((card) => (
                 <Link key={card.title} to={card.to as never} className={`soft-tile soft-tile-hover block bg-gradient-to-br ${card.tone} p-5`}>
                   <div className={`grid h-14 w-14 place-items-center rounded-2xl ${card.iconTone}`}>

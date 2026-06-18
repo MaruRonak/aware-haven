@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Clock3, MapPin, CheckCircle2, ChevronRight } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
+import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { resolveSOS } from "@/lib/safety.functions";
@@ -54,7 +55,9 @@ export function RecentAlerts() {
     <div className="mobile-shell p-5 sm:p-6">
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-lg font-semibold">Recent SOS Activity</h3>
-        <span className="text-xs text-primary">View all</span>
+        <Link to="/alerts-history" className="text-xs font-semibold text-primary hover:underline">
+          View all
+        </Link>
       </div>
       <ul className="mt-4 space-y-3">
         {loading ? (

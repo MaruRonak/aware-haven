@@ -35,7 +35,7 @@ export function ThreatAnalyzer() {
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6">
+    <div id="analyzer" className="scroll-mt-24 rounded-2xl border border-border bg-card p-6">
       <div className="flex items-center gap-2">
         <div className="grid h-9 w-9 place-items-center rounded-lg bg-primary/10 text-primary">
           <Brain className="h-4 w-4" />
