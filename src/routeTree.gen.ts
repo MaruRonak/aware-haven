@@ -20,8 +20,15 @@ import { Route as AuthenticatedSosRouteImport } from './routes/_authenticated/so
 import { Route as AuthenticatedRoleSelectRouteImport } from './routes/_authenticated/role-select'
 import { Route as AuthenticatedReportRouteImport } from './routes/_authenticated/report'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedPrivacySecurityRouteImport } from './routes/_authenticated/privacy-security'
+import { Route as AuthenticatedPersonalInformationRouteImport } from './routes/_authenticated/personal-information'
+import { Route as AuthenticatedNotificationSettingsRouteImport } from './routes/_authenticated/notification-settings'
+import { Route as AuthenticatedLanguageSelectionRouteImport } from './routes/_authenticated/language-selection'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedChangePasswordRouteImport } from './routes/_authenticated/change-password'
 import { Route as AuthenticatedAlertsHistoryRouteImport } from './routes/_authenticated/alerts-history'
+import { Route as AuthenticatedAlertsRouteImport } from './routes/_authenticated/alerts'
+import { Route as AuthenticatedAiRouteImport } from './routes/_authenticated/ai'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -77,17 +84,57 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPrivacySecurityRoute =
+  AuthenticatedPrivacySecurityRouteImport.update({
+    id: '/privacy-security',
+    path: '/privacy-security',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPersonalInformationRoute =
+  AuthenticatedPersonalInformationRouteImport.update({
+    id: '/personal-information',
+    path: '/personal-information',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedNotificationSettingsRoute =
+  AuthenticatedNotificationSettingsRouteImport.update({
+    id: '/notification-settings',
+    path: '/notification-settings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLanguageSelectionRoute =
+  AuthenticatedLanguageSelectionRouteImport.update({
+    id: '/language-selection',
+    path: '/language-selection',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedChangePasswordRoute =
+  AuthenticatedChangePasswordRouteImport.update({
+    id: '/change-password',
+    path: '/change-password',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAlertsHistoryRoute =
   AuthenticatedAlertsHistoryRouteImport.update({
     id: '/alerts-history',
     path: '/alerts-history',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAlertsRoute = AuthenticatedAlertsRouteImport.update({
+  id: '/alerts',
+  path: '/alerts',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAiRoute = AuthenticatedAiRouteImport.update({
+  id: '/ai',
+  path: '/ai',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -96,8 +143,15 @@ export interface FileRoutesByFullPath {
   '/auth-debug': typeof AuthDebugRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/ai': typeof AuthenticatedAiRoute
+  '/alerts': typeof AuthenticatedAlertsRoute
   '/alerts-history': typeof AuthenticatedAlertsHistoryRoute
+  '/change-password': typeof AuthenticatedChangePasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/language-selection': typeof AuthenticatedLanguageSelectionRoute
+  '/notification-settings': typeof AuthenticatedNotificationSettingsRoute
+  '/personal-information': typeof AuthenticatedPersonalInformationRoute
+  '/privacy-security': typeof AuthenticatedPrivacySecurityRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/report': typeof AuthenticatedReportRoute
   '/role-select': typeof AuthenticatedRoleSelectRoute
@@ -110,8 +164,15 @@ export interface FileRoutesByTo {
   '/auth-debug': typeof AuthDebugRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/ai': typeof AuthenticatedAiRoute
+  '/alerts': typeof AuthenticatedAlertsRoute
   '/alerts-history': typeof AuthenticatedAlertsHistoryRoute
+  '/change-password': typeof AuthenticatedChangePasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/language-selection': typeof AuthenticatedLanguageSelectionRoute
+  '/notification-settings': typeof AuthenticatedNotificationSettingsRoute
+  '/personal-information': typeof AuthenticatedPersonalInformationRoute
+  '/privacy-security': typeof AuthenticatedPrivacySecurityRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/report': typeof AuthenticatedReportRoute
   '/role-select': typeof AuthenticatedRoleSelectRoute
@@ -126,8 +187,15 @@ export interface FileRoutesById {
   '/auth-debug': typeof AuthDebugRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/ai': typeof AuthenticatedAiRoute
+  '/_authenticated/alerts': typeof AuthenticatedAlertsRoute
   '/_authenticated/alerts-history': typeof AuthenticatedAlertsHistoryRoute
+  '/_authenticated/change-password': typeof AuthenticatedChangePasswordRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/language-selection': typeof AuthenticatedLanguageSelectionRoute
+  '/_authenticated/notification-settings': typeof AuthenticatedNotificationSettingsRoute
+  '/_authenticated/personal-information': typeof AuthenticatedPersonalInformationRoute
+  '/_authenticated/privacy-security': typeof AuthenticatedPrivacySecurityRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/report': typeof AuthenticatedReportRoute
   '/_authenticated/role-select': typeof AuthenticatedRoleSelectRoute
@@ -142,8 +210,15 @@ export interface FileRouteTypes {
     | '/auth-debug'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/ai'
+    | '/alerts'
     | '/alerts-history'
+    | '/change-password'
     | '/dashboard'
+    | '/language-selection'
+    | '/notification-settings'
+    | '/personal-information'
+    | '/privacy-security'
     | '/profile'
     | '/report'
     | '/role-select'
@@ -156,8 +231,15 @@ export interface FileRouteTypes {
     | '/auth-debug'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/ai'
+    | '/alerts'
     | '/alerts-history'
+    | '/change-password'
     | '/dashboard'
+    | '/language-selection'
+    | '/notification-settings'
+    | '/personal-information'
+    | '/privacy-security'
     | '/profile'
     | '/report'
     | '/role-select'
@@ -171,8 +253,15 @@ export interface FileRouteTypes {
     | '/auth-debug'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/_authenticated/ai'
+    | '/_authenticated/alerts'
     | '/_authenticated/alerts-history'
+    | '/_authenticated/change-password'
     | '/_authenticated/dashboard'
+    | '/_authenticated/language-selection'
+    | '/_authenticated/notification-settings'
+    | '/_authenticated/personal-information'
+    | '/_authenticated/privacy-security'
     | '/_authenticated/profile'
     | '/_authenticated/report'
     | '/_authenticated/role-select'
@@ -268,11 +357,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/privacy-security': {
+      id: '/_authenticated/privacy-security'
+      path: '/privacy-security'
+      fullPath: '/privacy-security'
+      preLoaderRoute: typeof AuthenticatedPrivacySecurityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/personal-information': {
+      id: '/_authenticated/personal-information'
+      path: '/personal-information'
+      fullPath: '/personal-information'
+      preLoaderRoute: typeof AuthenticatedPersonalInformationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/notification-settings': {
+      id: '/_authenticated/notification-settings'
+      path: '/notification-settings'
+      fullPath: '/notification-settings'
+      preLoaderRoute: typeof AuthenticatedNotificationSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/language-selection': {
+      id: '/_authenticated/language-selection'
+      path: '/language-selection'
+      fullPath: '/language-selection'
+      preLoaderRoute: typeof AuthenticatedLanguageSelectionRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/change-password': {
+      id: '/_authenticated/change-password'
+      path: '/change-password'
+      fullPath: '/change-password'
+      preLoaderRoute: typeof AuthenticatedChangePasswordRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/alerts-history': {
@@ -282,12 +406,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAlertsHistoryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/alerts': {
+      id: '/_authenticated/alerts'
+      path: '/alerts'
+      fullPath: '/alerts'
+      preLoaderRoute: typeof AuthenticatedAlertsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ai': {
+      id: '/_authenticated/ai'
+      path: '/ai'
+      fullPath: '/ai'
+      preLoaderRoute: typeof AuthenticatedAiRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAiRoute: typeof AuthenticatedAiRoute
+  AuthenticatedAlertsRoute: typeof AuthenticatedAlertsRoute
   AuthenticatedAlertsHistoryRoute: typeof AuthenticatedAlertsHistoryRoute
+  AuthenticatedChangePasswordRoute: typeof AuthenticatedChangePasswordRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedLanguageSelectionRoute: typeof AuthenticatedLanguageSelectionRoute
+  AuthenticatedNotificationSettingsRoute: typeof AuthenticatedNotificationSettingsRoute
+  AuthenticatedPersonalInformationRoute: typeof AuthenticatedPersonalInformationRoute
+  AuthenticatedPrivacySecurityRoute: typeof AuthenticatedPrivacySecurityRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReportRoute: typeof AuthenticatedReportRoute
   AuthenticatedRoleSelectRoute: typeof AuthenticatedRoleSelectRoute
@@ -295,8 +440,16 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAiRoute: AuthenticatedAiRoute,
+  AuthenticatedAlertsRoute: AuthenticatedAlertsRoute,
   AuthenticatedAlertsHistoryRoute: AuthenticatedAlertsHistoryRoute,
+  AuthenticatedChangePasswordRoute: AuthenticatedChangePasswordRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedLanguageSelectionRoute: AuthenticatedLanguageSelectionRoute,
+  AuthenticatedNotificationSettingsRoute:
+    AuthenticatedNotificationSettingsRoute,
+  AuthenticatedPersonalInformationRoute: AuthenticatedPersonalInformationRoute,
+  AuthenticatedPrivacySecurityRoute: AuthenticatedPrivacySecurityRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReportRoute: AuthenticatedReportRoute,
   AuthenticatedRoleSelectRoute: AuthenticatedRoleSelectRoute,
@@ -318,3 +471,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

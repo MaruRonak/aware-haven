@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 
 function Dashboard() {
   const navigate = useNavigate();
-  const [role, setRole] = useState<string | null>(null);
+const [role, setRole] = useState<string | null>("senior");
   const [name, setName] = useState("there");
   const [score, setScore] = useState(75);
   const [external, setExternal] = useState<{ latitude: number | null; longitude: number | null }>();
@@ -44,8 +44,8 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-background pb-24">
       <DashboardHeader accent={accent as "rose" | "amber" | "emerald"} />
-      <main className="container mx-auto max-w-6xl px-4 -mt-2 space-y-6 pb-8">
-        {role === "woman" && (
+<main className="container mx-auto max-w-6xl px-4 mt-8 space-y-6 pb-8">
+            {role === "woman" && (
           <>
             <section className="mobile-shell p-5 sm:p-6">
               <div className="grid gap-5 lg:grid-cols-[1.1fr_1fr]">
@@ -143,26 +143,35 @@ function Dashboard() {
         )}
 
         {role === "parent" && <ChildrenModule />}
-        {role === "senior" && <SeniorModule />}
+     {role === "senior" && (
+  <>
+    <SeniorModule />
+  </>
+)}
       </main>
 
       <nav className="fixed inset-x-0 bottom-3 z-40 mx-auto flex w-[calc(100%-1.5rem)] max-w-xl items-center justify-around rounded-[2rem] border border-border bg-card/92 px-3 py-3 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.25)] backdrop-blur">
-        <Link to="/dashboard" className="flex min-w-0 flex-col items-center gap-1 rounded-2xl px-4 py-2 text-primary">
-          <Shield className="h-5 w-5" />
-          <span className="text-xs font-medium">Home</span>
-        </Link>
-        <button type="button" className="relative flex min-w-0 flex-col items-center gap-1 rounded-2xl px-4 py-2 text-muted-foreground">
-          <Bell className="h-5 w-5" />
-          <span className="absolute right-3 top-0 grid h-4 w-4 place-items-center rounded-full bg-rose-500 text-[9px] text-white">3</span>
-          <span className="text-xs font-medium">Alerts</span>
-        </button>
+        <Link to="/" className="flex min-w-0 flex-col items-center gap-1 rounded-2xl px-4 py-2 text-primary">
+  <Shield className="h-5 w-5" />
+  <span className="text-xs font-medium">Home</span>
+</Link>
+        <Link
+  to="/alerts"
+  className="relative flex min-w-0 flex-col items-center gap-1 rounded-2xl px-4 py-2 text-muted-foreground"
+>
+  <Bell className="h-5 w-5" />
+  <span className="absolute right-3 top-0 grid h-4 w-4 place-items-center rounded-full bg-rose-500 text-[9px] text-white">
+    3
+  </span>
+  <span className="text-xs font-medium">Alerts</span>
+</Link>
         <Link to="/sos" className="-mt-8 grid h-20 w-20 place-items-center rounded-full text-white shadow-xl" style={{ background: "var(--gradient-danger)" }}>
           <div className="flex flex-col items-center gap-1">
             <Siren className="h-7 w-7" />
             <span className="text-xs font-bold">SOS</span>
           </div>
         </Link>
-        <Link to="/dashboard" className="flex min-w-0 flex-col items-center gap-1 rounded-2xl px-4 py-2 text-muted-foreground">
+        <Link to="/ai" className="flex min-w-0 flex-col items-center gap-1 rounded-2xl px-4 py-2 text-muted-foreground">
           <Bot className="h-5 w-5" />
           <span className="text-xs font-medium">AI</span>
         </Link>

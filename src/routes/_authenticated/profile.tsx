@@ -6,6 +6,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+} from "react-leaflet";
+
+import "leaflet/dist/leaflet.css";
 
 type Profile = {
   user_id: string;
@@ -24,29 +32,60 @@ const roleLabel: Record<string, string> = {
   admin: "Admin",
 };
 
+
+
+
+
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({ meta: [{ title: "Profile — Cyber Raksha" }] }),
   component: ProfilePage,
 });
 
 function ProfilePage() {
-  const [p, setP] = useState<Profile | null>(null);
-  const [saving, setSaving] = useState(false);
+
+const [user, setUser] = useState<any>(null);
+
+useEffect(() => {
+  const loadUser = async () => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    console.log("SESSION:", session);
+    console.log("USER:", session?.user);
+    if (session?.user) {
+      setUser(session.user);
+    }
+  };
+
+  loadUser();
+}, []);
+
+const [p, setP] = useState<Profile | null>({
+user_id: "550e8400-e29b-41d4-a716-446655440000",
+  name: "Jay Solanki",
+  role: "senior",
+  phone: "+91 9876543210",
+  safety_score: 92,
+  language: "en",
+  location_enabled: true,
+});  const [saving, setSaving] = useState(false);
   const [stats, setStats] = useState({ sos: 0, ai: 0, contacts: 0, hours: 15 });
 
-  useEffect(() => {
-    (async () => {
-      const { data } = await supabase.from("profiles").select("*").maybeSingle();
-      if (data) setP(data as Profile);
-      const [a, b, c] = await Promise.all([
-        supabase.from("sos_alerts").select("id", { count: "exact", head: true }),
-        supabase.from("ai_alerts").select("id", { count: "exact", head: true }),
-        supabase.from("emergency_contacts").select("id", { count: "exact", head: true }),
-      ]);
-      setStats({ sos: a.count ?? 0, ai: b.count ?? 0, contacts: c.count ?? 0, hours: 15 });
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     const { data } = await supabase.from("profiles").select("*").maybeSingle();
+  //     if (data) setP(data as Profile);
+  //     const [a, b, c] = await Promise.all([
+  //       supabase.from("sos_alerts").select("id", { count: "exact", head: true }),
+  //       supabase.from("ai_alerts").select("id", { count: "exact", head: true }),
+  //       supabase.from("emergency_contacts").select("id", { count: "exact", head: true }),
+  //     ]);
+  //     setStats({ sos: a.count ?? 0, ai: b.count ?? 0, contacts: c.count ?? 0, hours: 15 });
+  //   })();
+  // }, []);
 
+  
   const save = async () => {
     if (!p) return;
     setSaving(true);
@@ -58,6 +97,50 @@ function ProfilePage() {
     if (error) return toast.error(error.message);
     toast.success("Profile saved");
   };
+
+const [profileImage, setProfileImage] = useState<string | null>(
+  localStorage.getItem("profileImage")
+);
+
+const [locationEnabled, setLocationEnabled] =
+  useState(true);
+
+const handleProfileImage = (
+  e: React.ChangeEvent<HTMLInputElement>
+) => {
+  const file = e.target.files?.[0];
+
+  if (!file) return;
+
+  const imageUrl = URL.createObjectURL(file);
+
+  setProfileImage(imageUrl);
+
+  localStorage.setItem(
+    "profileImage",
+    imageUrl
+  );
+};
+
+const [position, setPosition] =
+  useState<[number, number]>([
+    23.0225,
+    72.5714,
+  ]);
+
+useEffect(() => {
+  if (locationEnabled) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setPosition([
+          pos.coords.latitude,
+          pos.coords.longitude,
+        ]);
+      }
+    );
+  }
+}, [locationEnabled]);
+
 
   const logout = async () => {
     await supabase.auth.signOut();
@@ -79,51 +162,104 @@ function ProfilePage() {
               <p className="text-sm text-muted-foreground">Manage your account and safety settings</p>
             </div>
           </div>
-          <button type="button" className="relative grid h-11 w-11 place-items-center rounded-2xl border border-border bg-card">
-            <Bell className="h-5 w-5" />
-            <span className="absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-rose-500 text-[10px] text-white">3</span>
-          </button>
+          
         </header>
 
         <section className="mobile-shell p-6 sm:p-8">
           <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
             <div className="flex items-center gap-5">
-              <div className="grid h-32 w-32 place-items-center rounded-full bg-gradient-to-br from-violet-100 to-violet-50 text-6xl">👩</div>
-              <div>
-                <div className="flex flex-wrap items-center gap-3">
-                  <h2 className="text-4xl font-bold">{p.name}</h2>
-                  <span className="hero-badge px-3 py-1 text-sm font-semibold text-primary">{roleLabel[p.role] ?? p.role}</span>
-                </div>
-                <div className="mt-3 space-y-2 text-lg text-muted-foreground">
-                  <div>{p.phone ?? "+91 98765 43210"}</div>
-                  <div>your-account@cyberraksha.app</div>
-                </div>
-              </div>
-            </div>
-            <div className="rounded-[1.75rem] bg-gradient-to-br from-violet-50 to-sky-50 p-6 text-right text-7xl">🛡️</div>
-          </div>
 
-          <div className="mt-6 grid gap-4 lg:grid-cols-2">
-            <div className="rounded-[1.5rem] bg-background/80 p-5">
-              <div className="flex items-center gap-5">
-                <div className="relative grid h-28 w-28 place-items-center rounded-full border-[10px] border-violet-200 bg-white">
-                  <User className="h-10 w-10 text-primary" />
-                </div>
-                <div>
-                  <div className="text-sm font-semibold text-primary">Safety Score</div>
-                  <div className="mt-1 text-5xl font-bold text-primary">{p.safety_score}%</div>
-                  <div className="font-semibold text-emerald-600">Very Good</div>
-                  <p className="mt-2 text-sm text-muted-foreground">Great job! You're following good safety practices.</p>
-                </div>
-              </div>
-            </div>
-            <div className="rounded-[1.5rem] bg-background/80 p-5">
+<div className="relative">
+  <label htmlFor="profileImage">
+    <div className="h-24 w-24 rounded-full overflow-hidden border cursor-pointer">
+      {profileImage ? (
+        <img
+          src={profileImage}
+          alt="profile"
+          className="h-full w-full object-cover"
+        />
+      ) : (
+        <div className="h-full w-full flex items-center justify-center bg-violet-100 text-4xl">
+          👤
+        </div>
+      )}
+    </div>
+  </label>
+
+  <input
+    id="profileImage"
+    type="file"
+    accept="image/*"
+    onChange={handleProfileImage}
+    className="hidden"
+  />
+</div>
+
+
+  <div>
+  <div className="flex flex-wrap items-center gap-3">
+    <h2 className="text-4xl font-bold">{p.name}</h2>
+
+    <span className="hero-badge px-3 py-1 text-sm font-semibold text-primary">
+      {roleLabel[p.role] ?? p.role}
+    </span>
+  </div>
+</div>
+
+</div> {/* closes flex items-center gap-5 */}
+
+</div> {/* closes grid */}
+
+<div className="mt-6">          
+<div className="rounded-[1.5rem] bg-background/80 p-5 w-full">
               <div className="text-sm font-semibold text-primary">Location Status</div>
+              <div className="mt-4">
+                <Button
+                  onClick={() =>
+                      setP({
+                      ...p,
+                      location_enabled: !p.location_enabled,
+                      })
+                      }
+                >
+                  {p.location_enabled
+                    ? "Turn OFF Location"
+                    : "Turn ON Location"}
+                </Button>
+              </div>
               <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-700">
                 <MapPin className="h-4 w-4" /> {p.location_enabled ? "ON" : "OFF"}
               </div>
-              <p className="mt-3 text-sm text-muted-foreground">Location sharing is active during emergencies.</p>
-            </div>
+                  <p className="text-sm text-muted-foreground mt-2">
+  Current Location:
+  Ahmedabad, Gujarat
+</p>
+
+            {locationEnabled && position && (
+<div className="mt-4 h-64 overflow-hidden rounded-xl">
+      <MapContainer
+      center={position}
+      zoom={15}
+      style={{
+        height: "100%",
+        width: "100%",
+      }}
+      scrollWheelZoom={false}
+    >
+      <TileLayer
+        attribution='&copy; OpenStreetMap contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+
+      <Marker position={position}>
+        <Popup>
+          Your Current Location
+        </Popup>
+      </Marker>
+    </MapContainer>
+  </div>
+)}         
+                  </div>
           </div>
         </section>
 
@@ -132,20 +268,27 @@ function ProfilePage() {
             <h3 className="text-2xl font-bold">Account & Settings</h3>
             <div className="mt-5 space-y-3">
               {[
-                { label: "Personal Information", sub: "View and update your personal details" },
-                { label: "Language Selection", sub: "Choose your preferred language" },
-                { label: "Change Password", sub: "Update your account password" },
-                { label: "Privacy & Security", sub: "Manage your privacy and security settings" },
-                { label: "Notification Settings", sub: "Customize your notification preferences" },
-              ].map((item) => (
-                <div key={item.label} className="flex items-center justify-between rounded-[1.25rem] border border-border bg-background/70 px-4 py-4">
-                  <div>
-                    <div className="font-semibold">{item.label}</div>
-                    <div className="text-sm text-muted-foreground">{item.sub}</div>
-                  </div>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                </div>
-              ))}
+  { label: "Personal Information", sub: "View and update your personal details", path: "/personal-information" },
+  { label: "Language Selection", sub: "Choose your preferred language", path: "/language-selection" },
+  { label: "Change Password", sub: "Update your account password", path: "/change-password" },
+  { label: "Privacy & Security", sub: "Manage your privacy and security settings", path: "/privacy-security" },
+  { label: "Notification Settings", sub: "Customize your notification preferences", path: "/notification-settings" },
+].map((item) => (
+  <Link
+    key={item.label}
+    to={item.path}
+    className="flex items-center justify-between rounded-[1.25rem] border border-border bg-background/70 px-4 py-4 hover:bg-background"
+  >
+    <div>
+      <div className="font-semibold">{item.label}</div>
+      <div className="text-sm text-muted-foreground">
+        {item.sub}
+      </div>
+    </div>
+
+    <ChevronRight className="h-5 w-5 text-muted-foreground" />
+  </Link>
+))}
             </div>
           </section>
 
@@ -198,8 +341,12 @@ function ProfilePage() {
           </div>
         </section>
 
-        <button type="button" onClick={logout} className="flex w-full items-center justify-between rounded-[1.5rem] border border-rose-200 bg-rose-50 px-5 py-5 text-left text-rose-600">
-          <div>
+    
+<button
+  type="button"
+  onClick={logout}
+  className="cursor-pointer flex w-full items-center justify-between rounded-[1.5rem] border border-rose-200 bg-rose-50 px-5 py-5 text-left text-rose-600"
+>          <div>
             <div className="text-xl font-bold">Logout</div>
             <div className="text-sm text-rose-500">Securely logout from your account</div>
           </div>

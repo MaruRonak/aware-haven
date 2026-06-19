@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { PhoneCall, Lock, Video, FileWarning, CheckCircle2, XCircle, ShieldAlert, ExternalLink } from "lucide-react";
+import { PhoneCall, Lock, Video, FileWarning, CheckCircle2, ShieldAlert, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ThreatAnalyzer } from "@/components/ThreatAnalyzer";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-
-const SCAM_PATTERNS = ["lottery", "kbc", "kaun banega", "won", "prize", "refund", "bank", "kyc", "otp", "blocked", "police", "arrest", "customs", "tax"];
+import UPIImage from "@/assets/UPI.jpeg";
+import OTPImage from "@/assets/OTP.jpeg";
+import BankImage from "@/assets/Bank.jpeg";
 
 export function SeniorModule() {
   // Scam call checker
@@ -21,13 +22,15 @@ export function SeniorModule() {
   // Complaint
   const [complaint, setComplaint] = useState("");
   const [filing, setFiling] = useState(false);
+  const [message, setMessage] = useState("");
+const [result, setResult] = useState("");
 
   const checkCall = (e: React.FormEvent) => {
     e.preventDefault();
     const p = phone.replace(/\s|-/g, "");
     if (!p) return;
     const tooShort = p.length < 8;
-    const startsWeird = /^\+?(00|44|1|234|256)/.test(p) && !p.startsWith("+91");
+const startsWeird = /^\+?(00|44|1|234|256)/.test(p) && !p.startsWith("+91");
     const risky = tooShort || startsWeird;
     setCallVerdict({
       risky,
@@ -56,6 +59,28 @@ export function SeniorModule() {
     setPwdRating({ score, label: labels[score], color: colors[score], tips });
   };
 
+  const analyzeMessage = () => {
+  const suspiciousWords = [
+    "otp",
+    "bank",
+    "kyc",
+    "lottery",
+    "winner",
+    "prize",
+    "urgent",
+  ];
+
+  const found = suspiciousWords.some(word =>
+    message.toLowerCase().includes(word)
+  );
+
+  setResult(
+    found
+      ? "⚠ Possible Scam Message Detected"
+      : "✅ Message Looks Safe"
+  );
+};
+
   const fileComplaint = async () => {
     if (!complaint.trim()) return;
     setFiling(true);
@@ -77,6 +102,7 @@ export function SeniorModule() {
   return (
     <div className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-2">
+
         {/* Scam call checker */}
         <div className="rounded-3xl border border-border bg-card p-6">
           <div className="flex items-center gap-3">
@@ -84,7 +110,7 @@ export function SeniorModule() {
               <PhoneCall className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold">Scam Call Checker</h3>
+              <h3 className="text-2xl font-bold">Scam Call Checker</h3>
               <p className="text-xs text-muted-foreground">Verify a number before you call back.</p>
             </div>
           </div>
@@ -136,6 +162,31 @@ export function SeniorModule() {
         </div>
       </div>
 
+          <div className="rounded-3xl border border-border bg-card p-6">
+  <h3 className="text-lg font-semibold">
+    📩 Message Scam Checker
+  </h3>
+
+  <Textarea
+    value={message}
+    onChange={(e) => setMessage(e.target.value)}
+    placeholder="Paste SMS or WhatsApp message here"
+    className="mt-3"
+  />
+
+  <Button
+    onClick={analyzeMessage}
+    className="mt-3"
+  >
+    Analyze Message
+  </Button>
+
+  {result && (
+    <div className="mt-3 font-semibold">
+      {result}
+    </div>
+  )}
+</div>
       {/* Learning videos */}
       <div className="rounded-3xl border border-border bg-card p-6">
         <div className="flex items-center gap-3">
@@ -148,15 +199,32 @@ export function SeniorModule() {
           </div>
         </div>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          {[
-            { title: "Spotting UPI scams", desc: "How to avoid fake payment requests", url: "https://www.youtube.com/results?search_query=upi+scam+awareness" },
-            { title: "OTP fraud explained", desc: "Why you never share OTPs", url: "https://www.youtube.com/results?search_query=otp+fraud+awareness" },
-            { title: "Fake bank calls", desc: "Recognize impostor callers", url: "https://www.youtube.com/results?search_query=fake+bank+call+scam" },
-          ].map((v) => (
+         {[
+  {
+  title: "Spotting UPI scams",
+  desc: "How to avoid fake payment requests",
+  url: "https://www.youtube.com/results?search_query=upi+scam+awareness",
+  image: "/images/UPI.jpeg",
+},
+  {
+    title: "OTP fraud explained",
+    desc: "Why you never share OTPs",
+    url: "https://www.youtube.com/results?search_query=otp+fraud+awareness",
+    image: "/images/OTP.jpeg",
+  },
+  {
+    title: "Fake bank calls",
+    desc: "Recognize impostor callers",
+    url: "https://www.youtube.com/results?search_query=fake+bank+call+scam",
+    image: "/images/Bank.jpeg",
+  },
+].map((v) => (
             <a key={v.title} href={v.url} target="_blank" rel="noreferrer" className="group rounded-2xl border border-border p-4 hover:border-primary/40 hover:bg-accent/40 transition-all">
-              <div className="aspect-video rounded-lg bg-gradient-to-br from-muted to-accent grid place-items-center">
-                <Video className="h-6 w-6 text-muted-foreground" />
-              </div>
+              <img
+  src={v.image}
+  alt={v.title}
+  className="aspect-video w-full rounded-lg object-cover"
+/>
               <div className="mt-3 font-medium text-sm">{v.title}</div>
               <div className="text-xs text-muted-foreground">{v.desc}</div>
               <div className="mt-1 inline-flex items-center gap-1 text-xs text-primary">Watch <ExternalLink className="h-3 w-3" /></div>
@@ -188,6 +256,20 @@ export function SeniorModule() {
           </Button>
         </div>
       </div>
+
+          <div className="rounded-3xl border border-border bg-card p-6">
+  <h2 className="text-xl font-bold">
+    🛡 Daily Safety Tips
+  </h2>
+
+  <ul className="mt-4 space-y-2 text-sm">
+    <li>✔ Never share OTP with anyone.</li>
+    <li>✔ Banks never ask for passwords.</li>
+    <li>✔ Do not click unknown links.</li>
+    <li>✔ Verify before sending money.</li>
+    <li>✔ Block suspicious callers.</li>
+  </ul>
+</div>
 
       <ThreatAnalyzer />
     </div>
