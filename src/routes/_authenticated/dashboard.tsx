@@ -8,7 +8,7 @@ import { EmergencyContacts } from "@/components/EmergencyContacts";
 import { ThreatAnalyzer } from "@/components/ThreatAnalyzer";
 import { FakeCallButton } from "@/components/FakeCallButton";
 import { RecentAlerts } from "@/components/RecentAlerts";
-import { ChildrenModule } from "@/components/ChildrenModule";
+import ChildrenModule from "@/components/ChildrenModule";
 import { SeniorModule } from "@/components/SeniorModule";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
